@@ -184,9 +184,8 @@ public class BbsDAO {
 			 //3) 답변글 추가
 			 sql.delete(0, sql.length());
 			 sql.append(" INSERT INTO tb_bbs");
-			 sql.append("(bbsno, wname, subject, content, passwd, ip, grpno, indent, ansnum) ");
-			 sql.append(" values((SELECT NVL(MAX(bbsno), 0)+1 FROM tb_bbs)");
-			 sql.append(" , ?, ?, ?, ?, ?, ?, ?, ?) ");
+			 sql.append("(wname, subject, content, passwd, ip, grpno, indent, ansnum, regdt) ");
+			 sql.append(" values(?, ?, ?, ?, ?, ?, ?, ?, now()) ");
 			 pstmt=con.prepareStatement(sql.toString());
 			 pstmt.setString(1, dto.getWname());
 			 pstmt.setString(2, dto.getSubject());
@@ -409,77 +408,51 @@ public class BbsDAO {
 	    ArrayList<BbsDTO> list = null;
 
 	    // 10: 페이지당 출력할 레코드 갯수
-	    int startRow = ((nowPage-1) * recordPerPage) + 1; // (0 * 10) + 1 = 1, 11, 21
-	    int endRow = nowPage * recordPerPage;             // 1 * 10 = 10, 20, 30
-	    
-	    /*
-	     1 page: WHERE r >= 1 AND r <= 10;
-	     2 page: WHERE r >= 11 AND r <= 20;
-	     3 page: WHERE r >= 21 AND r <= 30;
-	     */
-	    
+	    int startRow = ((nowPage-1) * recordPerPage); 
+	    int endRow = nowPage * recordPerPage; 
 	    
 	    try {
 	    	con=dbopen.getConnection();
 			sql=new StringBuilder();
-	      
-	      word = word.trim(); // 문자열 좌우 공백 제거
-	      
-	      if (word.length() == 0){ // 검색을 안하는 경우
-	        sql.append(" SELECT bbsno, wname, subject, readcnt, regdt, grpno, indent, ansnum, r");
-	        sql.append(" FROM(");
-	        sql.append("      SELECT bbsno, wname, subject, readcnt, regdt, grpno, indent, ansnum, rownum as r");
-	        sql.append("      FROM (");
-	        sql.append("           SELECT bbsno, wname, subject, readcnt, regdt, grpno, indent, ansnum");
-	        sql.append("           FROM tb_bbs ");
-	        //sql.append("           WHERE indent=0 ");
-	        sql.append("           ORDER BY grpno DESC, ansnum ASC");
-	        sql.append("      )");
-	        sql.append(" )     ");
-	        sql.append(" WHERE r >= "+startRow+" AND r <= "+endRow);
-	        
-	        pstmt = con.prepareStatement(sql.toString());
-	        
-	      }
-	      else{ // 검색을 하는 경우
-	        sql.append(" SELECT bbsno, wname, subject, readcnt, regdt, grpno, indent, ansnum, r");
-	        sql.append(" FROM(");
-	        sql.append("      SELECT bbsno, wname, subject, readcnt, regdt, grpno, indent, ansnum, rownum as r");
-	        sql.append("      FROM (");
-	        sql.append("           SELECT bbsno, wname, subject, readcnt, regdt, grpno, indent, ansnum");
-	        sql.append("           FROM tb_bbs ");
-	        
-	        //검색
-	        if(word.length()>=1){
-	          String search=" WHERE "+col+" LIKE '%"+word+"%' ";	// AND indent=0
-	          sql.append(search);
-	        } 
-	        
-	        sql.append("           ORDER BY grpno DESC, ansnum ASC");
-	        sql.append("      )");
-	        sql.append(" )     ");
-	        sql.append(" WHERE r >= "+startRow+" AND r <= "+endRow);
-	        
-	        pstmt = con.prepareStatement(sql.toString());
+			word = word.trim(); // 문자열 좌우 공백 제거
+			if (word.length() == 0){ // 검색을 안하는 경우
+		        sql.append(" SELECT bbsno, wname, subject, readcnt, regdt, grpno, indent, ansnum");
+		        sql.append(" FROM tb_bbs");
+		        sql.append(" ORDER BY grpno DESC, ansnum ASC"); 
+		        sql.append(" Limit "+startRow+", "+endRow);
+		        
+		        pstmt = con.prepareStatement(sql.toString());
+		}else{
+		        sql.append(" SELECT bbsno, wname, subject, readcnt, regdt, grpno, indent, ansnum");
+		        sql.append(" FROM tb_bbs ");
+		        //검색
+		        if(word.length()>=1){
+		          String search=" WHERE "+col+" LIKE '%"+word+"%' ";
+		          sql.append(search);
+		        }
+		        sql.append(" ORDER BY grpno DESC, ansnum ASC");
+		        sql.append(" Limit "+startRow+", "+endRow);
+		        
+		        pstmt = con.prepareStatement(sql.toString());
 
 	      }
 	      
 	      rs=pstmt.executeQuery();
 	      if(rs.next()) {
-	        list=new ArrayList<BbsDTO>();
-	        BbsDTO dto=null; //레코드 1개보관
-	        do {
-	          dto=new BbsDTO();
-	          dto.setBbsno(rs.getInt("bbsno"));
-	          dto.setSubject(rs.getString("subject"));
-	          dto.setReadcnt(rs.getInt("readcnt"));
-	          dto.setWname(rs.getString("wname"));
-	          dto.setRegdt(rs.getString("regdt"));
-	          dto.setGrpno(rs.getInt("grpno"));
-	          dto.setIndent(rs.getInt("indent"));
-	          dto.setAnsnum(rs.getInt("ansnum"));
-	          list.add(dto);
-	        }while(rs.next());
+		        list=new ArrayList<BbsDTO>();
+		        BbsDTO dto=null; //레코드 1개보관
+		        do {
+			          dto=new BbsDTO();
+			          dto.setBbsno(rs.getInt("bbsno"));
+			          dto.setSubject(rs.getString("subject"));
+			          dto.setReadcnt(rs.getInt("readcnt"));
+			          dto.setWname(rs.getString("wname"));
+			          dto.setRegdt(rs.getString("regdt"));
+			          dto.setGrpno(rs.getInt("grpno"));
+			          dto.setIndent(rs.getInt("indent"));
+			          dto.setAnsnum(rs.getInt("ansnum"));
+			          list.add(dto);
+		        }while(rs.next());
 	      }
 
 	    } catch (Exception e) {
@@ -492,18 +465,14 @@ public class BbsDAO {
 	    
 	  } // list() end
 	
-/*	public void replyCnt(int grpno, int indent, ) {
-		
-	}//replyCnt() end
-*/	
-	
+
 	public ArrayList<BbsDTO> comment(String col, String word, int nowPage, int recordPerPage) {
 		Connection con = null;
 	    PreparedStatement pstmt = null;
 	    ResultSet rs = null;
 	    ArrayList<BbsDTO> comment = null;
 	    
-		int startRow = ((nowPage-1) * recordPerPage) + 1;
+		int startRow = ((nowPage-1) * recordPerPage);
 	    int endRow = nowPage * recordPerPage;
 
 		try {
@@ -512,30 +481,20 @@ public class BbsDAO {
 			
 			word = word.trim(); // 문자열 좌우 공백 제거
 			if (word.length() == 0){ // 검색을 안하는 경우
-				sql.append(" SELECT bbsno, subject, wname, readcnt, regdt, grpno, cnt, rnum");
-				sql.append(" FROM (");
-				sql.append("	SELECT bbsno, subject, wname, readcnt, regdt, grpno, cnt, rownum as rnum");
-				sql.append("	FROM (");
 				sql.append("		SELECT bb.bbsno, bb.subject, bb.wname, bb.readcnt, aa.grpno, aa.cnt, bb.regdt");
 				sql.append("		FROM(");
 				sql.append("			SELECT grpno, COUNT(grpno)-1 as cnt");
-				sql.append("			FROM tb_bbs bb");
+				sql.append("			FROM tb_bbs");
 				sql.append("			GROUP BY grpno");
 				sql.append("			) aa JOIN tb_bbs bb");
 				sql.append("		ON aa.grpno=bb.grpno");
 				sql.append("		WHERE bb.indent=0");
 				sql.append("		ORDER BY grpno DESC");
-				sql.append("	)");
-				sql.append(" )");
-				sql.append(" WHERE rnum >= "+startRow+" AND rnum <= "+endRow +" AND cnt!=0");
+		        sql.append(" Limit "+startRow+", "+endRow);
 	
 				pstmt=con.prepareStatement(sql.toString());
 			
 			}else {
-				sql.append(" SELECT bbsno, subject, grpno, cnt, wname, readcnt, regdt,  rnum ");
-				sql.append(" FROM ( ");
-				sql.append(" 	SELECT bbsno, subject, wname, readcnt, regdt, grpno, cnt, rownum as rnum ");
-				sql.append(" FROM ( ");
 				sql.append(" 		SELECT bb.bbsno, bb.subject, bb.wname, bb.readcnt, aa.grpno, aa.cnt, bb.regdt ");
 				sql.append(" 		FROM( ");
 				sql.append(" 			SELECT grpno, COUNT(grpno)-1 as cnt ");
@@ -551,10 +510,8 @@ public class BbsDAO {
 		        sql.append("			) aa JOIN tb_bbs bb ");
 		        sql.append("		ON aa.grpno=bb.grpno ");
 		        sql.append("		WHERE bb.indent=0 ");
-		        sql.append("		ORDER BY grpno DESC "); 
-		        sql.append("	) ");
-		        sql.append(") ");
-		        sql.append(" WHERE rnum >= "+startRow+" AND rnum<= "+endRow+" AND cnt!=0" );
+		        sql.append("		ORDER BY grpno DESC ");
+		        sql.append(" Limit "+startRow+", "+endRow);
 		        
 		        pstmt = con.prepareStatement(sql.toString());
 

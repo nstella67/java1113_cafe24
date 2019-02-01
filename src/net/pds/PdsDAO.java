@@ -51,46 +51,35 @@ public class PdsDAO {
 			dbclose.close(con, pstmt, rs);
 		}//try end
 		return cnt;
-	}//count() end///////////////////////////////////////////////////////////////////////////////////
+	}//count() end////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public ArrayList<PdsDTO> list(String col, String word, int nowPage, int recordPerPage) {
 	    ArrayList<PdsDTO> list = null;
-	    int startRow = ((nowPage-1) * recordPerPage) + 1;
+	    int startRow = ((nowPage-1) * recordPerPage);
 	    int endRow = nowPage * recordPerPage; 
 	    try {
 	    	con=dbopen.getConnection();
 			sql=new StringBuilder();
-			word = word.trim(); // 문자열 좌우 공백 제거
-/*			if (word.length() == 0){ // 검색을 안하는 경우
-		        sql.append(" SELECT pdsno, wname, subject, readcnt, regdate, filename, rnum ");
-		        sql.append(" FROM (");
-		        sql.append("   SELECT pdsno, subject, wname, readcnt, regdate, filename, rownum as rnum");
-				sql.append("	FROM(");*/
-				sql.append("		SELECT pdsno, subject, wname, readcnt, regdate, filename");
-		        sql.append(" 		FROM tb_pds ");
-		        sql.append(" 		ORDER BY pdsno DESC ");
-/*		        sql.append("       )");
-		        sql.append("  )     ");
-		        sql.append(" WHERE rnum >= "+startRow+" AND rnum <= "+endRow +" AND cnt!=0");
+			word = word.trim();
+			if (word.length() == 0){ // 검색을 안하는 경우
+		        sql.append(" SELECT pdsno, subject, wname, readcnt, regdate, filename");
+		        sql.append(" FROM tb_pds");
+		        sql.append(" ORDER BY pdsno desc");
+		        sql.append(" LIMIT "+ startRow+","+ endRow);
+		        pstmt = con.prepareStatement(sql.toString());
 			}else{ // 검색을 하는 경우
-		        sql.append(" SELECT pdsno, wname, subject, readcnt, regdate, rnum");
-		        sql.append(" FROM(");
-		        sql.append("      SELECT pdsno, wname, subject, readcnt, regdate, rownum as rnum");
-		        sql.append("      FROM (");
-		        sql.append("           SELECT pdsno, wname, subject, readcnt, regdate");
-		        sql.append("           FROM tb_pds ");
+		    	sql.append(" SELECT pdsno, wname, subject, readcnt, regdate, filename");
+		        sql.append(" FROM tb_pds ");
 		        //검색
 		        if(word.length()>=1){
-		          String search=" WHERE "+col+" LIKE '%"+word+"%' ";
-		          sql.append(search);
+		        	String search=" WHERE "+col+" LIKE '%"+word+"%' ";
+		        	sql.append(search);
 		        }
 		        sql.append("           ORDER BY pdsno DESC");
-		        sql.append("      )");
-		        sql.append(" )     ");
-		        sql.append(" WHERE rnum >= "+startRow+" AND rnum <= "+endRow);*/
+		        sql.append(" LIMIT "+ startRow+","+ endRow);
 	        pstmt = con.prepareStatement(sql.toString());
-/*			}//if end
-*/	      rs=pstmt.executeQuery();
+			}//if end
+	      rs=pstmt.executeQuery();
 	      if(rs.next()) {
 	        list=new ArrayList<PdsDTO>();
 	        do {
