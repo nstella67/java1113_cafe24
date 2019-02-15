@@ -1,7 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ page import="java.sql.Timestamp" %>
 <%@ include file="../header.jsp" %>
-<%@ include file="/view/color.jspf" %>
 
 <!-- 본문 시작 loginForm.jsp -->
 <p>* 로/그/인 *</p>
@@ -55,14 +54,14 @@
 	<table>
 	<tr>
 		<td rowspan="3">${sessionScope.memid } 님이 방문하셨습니다.
-			<form method="post" action="logout.do">
+			<form method="post" action="./logout.do">
 				<input type="submit" value="로그아웃">
 			</form>
-			<form method="post" action="modifyForm.do">
+			<form method="post" action="memCheck.do?page=modifyForm">
 				<input type="hidden" name="id" value="${sessionScope.memid }">
 				<input type="submit" value="회원정보변경">
 			</form>
-			<form method="post" action="withdrawForm.do">
+			<form method="post" action="memCheck.do?page=withdraw">
 				<input type="submit" value="회원탈퇴">
 			</form>
 		</td>

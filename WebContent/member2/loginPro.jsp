@@ -5,7 +5,7 @@
 
 <c:if test="${res==1 }">
 	<c:set var="memid" value="${sessionScope.s_id }" scope="session"></c:set>
-	<meta http-equiv="Refresh" content="0; url=/myweb/member2/loginForm.do">
+	<meta http-equiv="Refresh" content="0; url=/member2/loginForm.do">
 </c:if>
 <c:if test="${res==0 }">
 	아이디 및 비밀번호가 다릅니다<br>
