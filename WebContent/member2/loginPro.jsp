@@ -1,7 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
-<%@ page import="java.sql.Timestamp" %>
 <%@ include file="../header.jsp" %>
-<%@ include file="/view/color.jspf" %>
 
 <c:if test="${res==1 }">
 	<c:set var="memid" value="${sessionScope.s_id }" scope="session"></c:set>

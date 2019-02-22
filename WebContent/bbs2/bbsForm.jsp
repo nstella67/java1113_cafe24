@@ -1,6 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ include file="../header.jsp" %>
-<%@ include file="/view/color.jspf" %>
 
 <!-- 본문 시작 bbsForm.jsp-->
 <strong>* 글/쓰/기 *</strong>
@@ -14,7 +13,7 @@
 <table>
 <tr>
   <td align="right" colspan=2 bgcolor="${value_c }">
-      <a href="/myweb/bbs2/bbslist.do">글목록</a></td>
+      <a href="/bbs2/bbslist.do">글목록</a></td>
 </tr>
 <tr>
   <td bgcolor="${value_c }">이름</td>

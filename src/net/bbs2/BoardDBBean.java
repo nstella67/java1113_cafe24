@@ -71,7 +71,7 @@ public class BoardDBBean {
 				pstmt=con.prepareStatement(sql.toString());
 				pstmt.setInt(1, ref);
 				pstmt.setInt(2, re_step);
-				pstmt.executeQuery();
+				pstmt.executeUpdate();
 				re_step=re_step+1;
 				re_level=re_level+1;
 			}else {

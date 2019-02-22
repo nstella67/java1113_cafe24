@@ -18,7 +18,7 @@
 		<table width="450" border="1">
 		<tr>
 		  <td align="right" colspan=2 bgcolor="${value_c }">
-		      <a href="/myweb/bbs2/bbslist.do">글목록</a></td>
+		      <a href="/bbs2/bbslist.do">글목록</a></td>
 		</tr>
 		<tr>
 		  <td bgcolor="${value_c }">이름</td>

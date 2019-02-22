@@ -31,7 +31,7 @@ public class MemberDAO {
 			sql=new StringBuilder();
 			
 			sql.append(" SELECT COUNT(id) AS cnt");
-			sql.append(" FROM MEMBER "); 
+			sql.append(" FROM member "); 
 			sql.append(" WHERE id=?");
 			
 			pstmt = con.prepareStatement(sql.toString());
@@ -59,7 +59,7 @@ public class MemberDAO {
 			sql=new StringBuilder();
 			
 			sql.append(" SELECT COUNT(email) AS cnt "); 
-			sql.append(" FROM MEMBER "); 
+			sql.append(" FROM member "); 
 			sql.append(" WHERE email=? ");
 			
 			pstmt = con.prepareStatement(sql.toString());
@@ -85,7 +85,7 @@ public class MemberDAO {
 			
 			sql = new StringBuilder();
 			sql.append(" insert into member(id, passwd, mname, tel, email, zipcode, address1, address2, job, mlevel, mdate) ");
-			sql.append(" values(?, ?, ?, ?, ?, ?, ?, ?, ?, 'D1', sysdate)");
+			sql.append(" values(?, ?, ?, ?, ?, ?, ?, ?, ?, 'D1', now())");
 			
 			pstmt = con.prepareStatement(sql.toString());
 			pstmt.setString(1, dto.getId());
@@ -148,7 +148,7 @@ public class MemberDAO {
 			sql=new StringBuilder();
 			
 			sql.append(" SELECT COUNT(id) cnt");
-			sql.append(" FROM MEMBER");
+			sql.append(" FROM member");
 			
 			pstmt=con.prepareStatement(sql.toString());
 			rs=pstmt.executeQuery();
@@ -175,7 +175,7 @@ public class MemberDAO {
 			con=dbopen.getConnection();
 			sql=new StringBuilder();
 			sql.append(" SELECT id, passwd, mname, tel, email, mdate, mlevel");
-			sql.append(" FROM MEMBER");
+			sql.append(" FROM member");
 			
 			if(col.equals("id")||col.equals("")) {
 				sql.append(" ORDER BY id ASC");
@@ -221,7 +221,7 @@ public class MemberDAO {
 			con=dbopen.getConnection();
 			
 			sql = new StringBuilder();
-			sql.append(" UPDATE MEMBER"); 
+			sql.append(" UPDATE member"); 
 			sql.append(" SET mlevel=?"); 
 			sql.append(" WHERE id=?");
 				
@@ -248,7 +248,7 @@ public class MemberDAO {
 			con=dbopen.getConnection();
 			
 			sql = new StringBuilder();
-			sql.append(" DELETE FROM MEMBER");
+			sql.append(" DELETE FROM member");
 			sql.append(" WHERE id=?");
 				
 			pstmt = con.prepareStatement(sql.toString());
@@ -356,6 +356,108 @@ public class MemberDAO {
 		}//try end
 		return res;
 	}//newpwSend() end/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	public MemberDTO memUpdateForm(MemberDTO dto) {	//회원정보 수정폼
+		ResultSet rs=null;
+		
+		try {
+			con=dbopen.getConnection();
+			sql=new StringBuilder();
+			
+			sql.append(" SELECT id, passwd, mname, email, tel, zipcode, address1, address2, job ");
+			sql.append(" FROM member");
+			sql.append(" WHERE id=? AND passwd=?"); 
+			
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, dto.getId());
+			pstmt.setString(2, dto.getPasswd());
+			rs=pstmt.executeQuery();
+			if(rs.next()) {
+				dto=new MemberDTO();
+				dto.setId(rs.getString("id"));
+				dto.setPasswd(rs.getString("passwd"));
+				dto.setMname(rs.getString("mname"));
+				dto.setEmail(rs.getString("email"));
+				dto.setTel(rs.getString("tel"));
+				dto.setZipcode(rs.getString("zipcode"));
+				dto.setAddress1(rs.getString("address1"));
+				dto.setAddress2(rs.getString("address2"));
+				dto.setJob(rs.getString("job"));
+			}
+		}catch(Exception e) {
+			System.out.println("회원정보 불러오기 실패 : "+e);
+		}finally {
+			dbclose.close(con, pstmt, rs);
+		}//try end
+		
+		return dto;
+	}//memUpdateForm() end///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	
+	public int memUpdate(MemberDTO dto) {
+		int res=0;
+		
+		try {
+			con=dbopen.getConnection();
+			
+			sql = new StringBuilder();
+			sql.append(" UPDATE member"); 
+			sql.append(" SET passwd=?, mname=?, email=?, tel=?, zipcode=?, address1=?, address2=?, job=?"); 
+			sql.append(" WHERE id=?");
+				
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, dto.getPasswd());
+			pstmt.setString(2, dto.getMname());
+			pstmt.setString(3, dto.getEmail());
+			pstmt.setString(4, dto.getTel());
+			pstmt.setString(5, dto.getZipcode());
+			pstmt.setString(6, dto.getAddress1());
+			pstmt.setString(7, dto.getAddress2());
+			pstmt.setString(8, dto.getJob());
+			pstmt.setString(9, dto.getId());
+
+			res=pstmt.executeUpdate();
+			
+		}catch(Exception e) {
+			System.out.println("수정실패 : "+e);
+		}finally {
+			dbclose.close(con, pstmt);
+		}//try end
+		
+		return res;
+	}
+	
+	
+	
+	public int memDelete(MemberDTO dto) {	//회원탈퇴 → 등급 F1으로 변경
+		int res=0;
+		
+		try {
+			con=dbopen.getConnection();
+			
+			sql = new StringBuilder();
+			sql.append(" UPDATE member"); 
+			sql.append(" SET mlevel='F1'"); 
+			sql.append(" WHERE id=?");
+				
+			pstmt = con.prepareStatement(sql.toString());
+			pstmt.setString(1, dto.getId());
+
+			res=pstmt.executeUpdate();
+			
+		}catch(Exception e) {
+			System.out.println("회원 탈퇴 실패 : "+e);
+		}finally {
+			dbclose.close(con, pstmt);
+		}//try end
+		
+		return res;
+		
+		
+	}//memDel() end///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	
 	
 }//class end

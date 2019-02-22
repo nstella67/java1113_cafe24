@@ -1,7 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ page import="java.sql.Timestamp" %>
 <%@ include file="../header.jsp" %>
-<%@ include file="/view/color.jspf" %>
 
 <!-- 본문 시작 bbsList.jsp-->
 <strong>* 글내용보기 *</strong>

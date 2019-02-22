@@ -17,7 +17,7 @@ public class BbsList implements CommandAction {
 		total_cnt=dao.getArticleCount();
 		
 		//페이징
-		int numPerPage=3;	//한 페이지당 레코드 갯수
+		int numPerPage=10;	//한 페이지당 레코드 갯수
 		int pagePerBlock=10;	//페이지 리스트
 		
 		String pageNum=req.getParameter("pageNum");

@@ -19,7 +19,7 @@ public class Withdraw implements CommandAction {
 		article.setPasswd(passwd);
 
 		MemberDBBean dao=new MemberDBBean();
-		int res=dao.withdraw(article);
+		int res=dao.withdraw(id, passwd);
 		
 		req.setAttribute("res", res);
 		return "withdrawPro.jsp";
